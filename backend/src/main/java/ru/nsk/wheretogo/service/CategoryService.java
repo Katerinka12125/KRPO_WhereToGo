@@ -1,45 +1,47 @@
 package ru.nsk.wheretogo.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.nsk.wheretogo.dto.CategoryDTO;
 import ru.nsk.wheretogo.entity.Category;
 import ru.nsk.wheretogo.repository.CategoryRepository;
 
+import javax.transaction.Transactional;
+import javax.validation.ValidationException;
 import java.util.List;
+import static java.util.stream.Collectors.toList;
+
+
 
 @Service
 public class CategoryService {
 
-    @Autowired
-    private CategoryRepository repository;
+    private CategoryRepository categoryRepository;
 
-    public List<Category> saveCategory(List<Category> categories) {
-        return repository.saveAll(categories);
-
+    public CategoryService(CategoryRepository categoryRepository) {
+        this.categoryRepository = categoryRepository;
     }
 
-    public Category saveCategory(Category categories) {
-        return repository.save(categories);
-
+    @Transactional
+    public void addCategory(CategoryDTO categoryDTO) {
+        if (categoryRepository.existsByName(categoryDTO.getName())) {
+            throw new ValidationException("Category already exist");
+        }
+        categoryRepository.save(Category.getFromDTO(categoryDTO));
     }
 
-    public List<Category> getAll() {
-        return repository.findAll();
+    @Transactional
+    public void deleteCategory(CategoryDTO categoryDTO) {
+        if ( (categoryDTO.getId() == null) || (categoryDTO == null)) {
+            return;
+        }
+        categoryRepository.deleteById(categoryDTO.getId());
     }
 
-    public Category getCategoryByName(String name) {
-        return repository.findByName(name);
-
-    }
-    public String deleteCategory(long id) {
-        repository.deleteById(id);
-        return "category doesn't exists" + id;
-
-    }
-
-    public Category updateCategory(Category category) {
-        Category existingCategory = repository.findById(category.getId()).orElse(null);
-        existingCategory.setName(category.getName());
-        return repository.save(existingCategory);
+    public List<CategoryDTO> getAllcategories() {
+        return categoryRepository.findAll()
+                .stream()
+                .map(CategoryDTO::getFromEntity)
+                .collect(toList());
     }
 }
+

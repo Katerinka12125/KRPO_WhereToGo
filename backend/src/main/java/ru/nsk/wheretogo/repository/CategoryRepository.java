@@ -3,6 +3,6 @@ package ru.nsk.wheretogo.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import ru.nsk.wheretogo.entity.Category;
 
-public interface CategoryRepository extends JpaRepository <Category, Long> {
-    Category findByName(String name);
+public interface CategoryRepository extends JpaRepository<Category, Long> {
+    boolean existsByName(String name);
 }

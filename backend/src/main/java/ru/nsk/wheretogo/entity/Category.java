@@ -1,31 +1,40 @@
 package ru.nsk.wheretogo.entity;
 
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
+import ru.nsk.wheretogo.dto.CategoryDTO;
 
 import javax.persistence.*;
 
-@Data
-@Setter
 @Getter
+@Setter
 @NoArgsConstructor
-
+@Accessors(chain = true)
 @Entity
 @Table(name = "categories")
 public class Category {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name")
     private String name;
 
-    public Category(String name) {
-        this.name = name;
+    public Category(String name)
+    {this.name = name;}
+
+    public static Category getFromDTO(CategoryDTO dto ) {
+        if (dto == null) {
+            return null;
+        }
+        return new Category()
+                .setId(dto.getId())
+                .setName(dto.getName());
     }
+
 
 }
